@@ -1,0 +1,33 @@
+name: Build macOS Intel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Compilar para Intel (x86_64)
+        run: |
+          xcodebuild -project NovaController/NovaController.xcodeproj \
+            -scheme NovaController \
+            -configuration Release \
+            -arch x86_64 \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            SYMROOT=$(pwd)/build \
+            build
+
+      - name: Comprimir App
+        run: |
+          cd build/Release
+          zip -r NovaController-Intel.zip NovaController.app
+
+      - name: Subir resultado
+        uses: actions/upload-artifact@v4
+        with:
+          name: NovaController-Intel
+          path: build/Release/NovaController-Intel.zip
