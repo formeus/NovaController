@@ -16,23 +16,19 @@ jobs:
             -configuration Release \
             -arch x86_64 \
             ONLY_ACTIVE_ARCH=NO \
-            BUILD_DIR=$PWD/build \
+            CONFIGURATION_BUILD_DIR=$PWD/build \
             clean build
 
-      - name: Find and Zip App
+      - name: Zip
         run: |
-          find $PWD/build -name "*.app" -type d
-          APP_PATH=$(find $PWD/build -name "*.app" -type d | head -n 1)
-          echo "App found at: $APP_PATH"
-          cd $(dirname $APP_PATH)
-          zip -r NovaController-Intel.zip $(basename $APP_PATH)
+          cd build
+          zip -r -y NovaController-Intel.zip NovaController.app || true
+          mv NovaController-Intel.zip ../
+          cd ..
           ls -lh *.zip
-          mkdir -p $PWD/../release
-          mv *.zip $PWD/../release/
-          echo "RELEASE_PATH=$PWD/../release" >> $GITHUB_ENV
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: NovaController-Intel
-          path: release/NovaController-Intel.zip
+          path: NovaController-Intel.zip
